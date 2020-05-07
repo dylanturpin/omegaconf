@@ -1,5 +1,6 @@
 import copy
 import itertools
+it = itertools
 from typing import (
     Any,
     Callable,
@@ -33,6 +34,31 @@ from .errors import (
     ReadonlyConfigError,
     ValidationError,
 )
+def xislice(iterable, *args):
+    #xislice(coll,stop)
+    #xislice(coll,start,stop,[step])
+    #handle negative args
+
+    sz = len(args)
+    if sz == 0:
+        start = 0
+        stop = len(iterable)
+        step = 1
+    elif sz == 1:
+        start = 0
+        stop = args[0] if args[0] != None else len(iterable)
+        step = 1
+    elif sz == 2:
+        start = args[0] if args[0] != None else 0
+        stop = args[1] if args[1] != None else len(iterable)
+        step = 1
+    else:
+        start = args[0] if args[0] != None else 0
+        stop = args[1] if args[1] != None else len(iterable)
+        step = args[2] if args[2] != None else 1
+
+    for x in range(start, stop, step):
+        yield iterable[x]
 
 
 class ListConfig(BaseContainer, MutableSequence[Any]):
@@ -139,7 +165,7 @@ class ListConfig(BaseContainer, MutableSequence[Any]):
             assert isinstance(self.__dict__["_content"], list)
             if isinstance(index, slice):
                 result = []
-                for slice_idx in itertools.islice(
+                for slice_idx in xislice(
                     range(0, len(self)), index.start, index.stop, index.step
                 ):
                     val = self._resolve_with_default(
